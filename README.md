@@ -66,8 +66,7 @@
 ---
 
 ## 🌐 Despliegue
-La versión de producción se encuentra disponible en:
-aun no
+La versión de producción se encuentra disponible en: https://urbanstep-rdny.vercel.app/
 
 ---
 **Desarrollado por:** Miguel JR - Valledupar, Colombia.
