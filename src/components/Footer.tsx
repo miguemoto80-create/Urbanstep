@@ -59,7 +59,9 @@ export default function Footer() {
             <h3 className="text-sm font-semibold">Síguenos</h3>
             <div className="mt-4 flex gap-4">
               <a
-                href="#"
+                href="https://www.instagram.com/urbanstep.oficiall/"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="flex h-10 w-10 items-center justify-center rounded-full bg-muted transition-colors hover:bg-primary hover:text-primary-foreground"
               >
                 <Instagram className="h-5 w-5" />

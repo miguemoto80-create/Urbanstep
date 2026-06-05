@@ -59,6 +59,7 @@ router.post('/checkout', authMiddleware, async (req, res) => {
   try {
     const { items, total } = req.body; // items: [{ productId, size, quantity }]
 
+    const emailItemsData = [];
     for (const item of items) {
       const product = await Product.findByPk(item.productId, { transaction: t });
       if (!product) {
@@ -80,6 +81,14 @@ router.post('/checkout', authMiddleware, async (req, res) => {
       // Sequelize no detecta cambios en campos JSON anidados a menos que los reasignes
       product.stock_por_talla = { ...stock }; 
       await product.save({ transaction: t });
+
+      emailItemsData.push({
+        nombre: product.nombre,
+        marca: product.marca,
+        size: item.size,
+        quantity: item.quantity,
+        precio: product.precio
+      });
     }
 
     const order = await Order.create({
@@ -101,7 +110,11 @@ router.post('/checkout', authMiddleware, async (req, res) => {
           }
         });
 
-        const itemsHtml = items.map(item => `<li>Producto ID: ${item.productId} | Talla: ${item.size} | Cantidad: ${item.quantity}</li>`).join('');
+        const itemsHtml = emailItemsData.map(item => `
+          <li style="margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #eee;">
+            <strong>${item.marca} ${item.nombre}</strong><br/>
+            Talla: ${item.size} | Cantidad: ${item.quantity} | Precio: $${item.precio}
+          </li>`).join('');
 
         await transporter.sendMail({
           from: `"Urban Step" <${process.env.SMTP_USER || 'no-reply@urbanstep.com'}>`,
@@ -109,17 +122,26 @@ router.post('/checkout', authMiddleware, async (req, res) => {
           subject: `Confirmación de Orden #${order.id} - Urban Step`,
           html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
-              <h1 style="color: #000;">¡Gracias por tu compra, ${user.nombre}!</h1>
-              <p style="color: #555; font-size: 16px;">Tu orden ha sido procesada exitosamente y ya estamos preparando tus sneakers.</p>
+              <h1 style="color: #000;">¡Hola ${user.nombre}, gracias por tu pedido!</h1>
+              <p style="color: #555; font-size: 16px;">Hemos separado tus sneakers exitosamente. Para que tu pedido sea despachado, por favor sigue estos pasos:</p>
               
+              <div style="background-color: #f9f9f9; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                <h3 style="margin-top: 0; color: #000;">Pasos para finalizar tu compra:</h3>
+                <ol style="color: #333; margin-bottom: 0;">
+                  <li style="margin-bottom: 10px;">Realiza una transferencia bancaria o depósito por el valor total de <strong>$${total}</strong> a la cuenta: <br/><strong>Banco de Ejemplo - Cuenta de Ahorros #123456789</strong> a nombre de Urban Step.</li>
+                  <li style="margin-bottom: 10px;">Envía el comprobante de pago respondiendo a este mismo correo electrónico.</li>
+                  <li>Una vez verificado el pago, te enviaremos tu número de guía para el rastreo del envío.</li>
+                </ol>
+              </div>
+
               <h3 style="border-bottom: 1px solid #eee; padding-bottom: 10px;">Resumen de la orden #${order.id}:</h3>
               <ul style="list-style: none; padding-left: 0; color: #333;">
                 ${itemsHtml}
               </ul>
               
-              <h2 style="color: #000; text-align: right; margin-top: 20px;">Total pagado: $${total}</h2>
+              <h2 style="color: #000; text-align: right; margin-top: 20px;">Total a Pagar: $${total}</h2>
               <br/>
-              <p style="color: #777; font-size: 14px; text-align: center;">Te notificaremos cuando tu pedido esté en camino. ¡Disfruta tu nuevo estilo!</p>
+              <p style="color: #777; font-size: 14px; text-align: center;">Tienes 24 horas para realizar el pago antes de que el pedido sea cancelado y los productos vuelvan al inventario. ¡Disfruta tu nuevo estilo!</p>
             </div>
           `
         });
