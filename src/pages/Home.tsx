@@ -132,12 +132,13 @@ export default function Home() {
           <h2 className="text-center text-xl font-semibold">Marcas Premium</h2>
           <div className="mt-10 flex flex-wrap items-center justify-center gap-12">
             {['Nike', 'Adidas', 'Jordan', 'Puma', 'New Balance', 'Converse'].map((brand) => (
-              <span
+              <Link
                 key={brand}
+                to={`/catalogo?marca=${brand}`}
                 className="text-2xl font-bold text-muted-foreground/50 transition-colors hover:text-foreground"
               >
                 {brand}
-              </span>
+              </Link>
             ))}
           </div>
         </div>

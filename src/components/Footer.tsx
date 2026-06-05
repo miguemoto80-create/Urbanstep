@@ -42,18 +42,16 @@ export default function Footer() {
           <div>
             <h3 className="text-sm font-semibold">Marcas</h3>
             <ul className="mt-4 space-y-2">
-              <li>
-                <span className="text-sm text-muted-foreground">Nike</span>
-              </li>
-              <li>
-                <span className="text-sm text-muted-foreground">Adidas</span>
-              </li>
-              <li>
-                <span className="text-sm text-muted-foreground">Jordan</span>
-              </li>
-              <li>
-                <span className="text-sm text-muted-foreground">New Balance</span>
-              </li>
+              {['Nike', 'Adidas', 'Jordan', 'New Balance'].map((brand) => (
+                <li key={brand}>
+                  <Link
+                    to={`/catalogo?marca=${brand}`}
+                    className="text-sm text-muted-foreground hover:text-foreground"
+                  >
+                    {brand}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 

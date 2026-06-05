@@ -1,4 +1,5 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { Search, SlidersHorizontal, X } from 'lucide-react'
 import ProductCard from '../components/ProductCard'
 import { useProducts } from '../context/ProductContext'
@@ -16,7 +17,16 @@ const priceRanges = [
 export default function Catalogo() {
   const { products } = useProducts()
   const [searchQuery, setSearchQuery] = useState('')
-  const [selectedBrand, setSelectedBrand] = useState<string | null>(null)
+  const [searchParams, setSearchParams] = useSearchParams()
+  const initialBrand = searchParams.get('marca')
+  const [selectedBrand, setSelectedBrand] = useState<string | null>(initialBrand)
+
+  useEffect(() => {
+    const marcaParam = searchParams.get('marca')
+    if (marcaParam !== selectedBrand && marcaParam !== null) {
+      setSelectedBrand(marcaParam)
+    }
+  }, [searchParams])
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [selectedSize, setSelectedSize] = useState<string | null>(null)
   const [selectedPriceRange, setSelectedPriceRange] = useState(priceRanges[0])
@@ -42,6 +52,7 @@ export default function Catalogo() {
     setSelectedSize(null)
     setSelectedPriceRange(priceRanges[0])
     setSearchQuery('')
+    setSearchParams(new URLSearchParams())
   }
 
   const hasActiveFilters = selectedBrand || selectedCategory || selectedSize || selectedPriceRange.label !== 'Todos' || searchQuery
