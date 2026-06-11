@@ -13,12 +13,14 @@ const priceRanges = [
   { label: '$200,000 - $600,000', min: 200000, max: 600000 },
   { label: 'Más de $600,000', min: 600000, max: 10000000 },
 ]
+const colors = ['Blanco', 'Negro', 'Rojo', 'Azul', 'Gris', 'Multicolor']
 
 export default function Catalogo() {
   const { products } = useProducts()
-  const [searchQuery, setSearchQuery] = useState('')
   const [searchParams, setSearchParams] = useSearchParams()
   const initialBrand = searchParams.get('marca')
+  const initialQuery = searchParams.get('q') || ''
+  const [searchQuery, setSearchQuery] = useState(initialQuery)
   const [selectedBrand, setSelectedBrand] = useState<string | null>(initialBrand)
 
   useEffect(() => {
@@ -26,9 +28,14 @@ export default function Catalogo() {
     if (marcaParam !== selectedBrand && marcaParam !== null) {
       setSelectedBrand(marcaParam)
     }
+    const qParam = searchParams.get('q')
+    if (qParam !== null && qParam !== searchQuery) {
+      setSearchQuery(qParam)
+    }
   }, [searchParams])
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [selectedSize, setSelectedSize] = useState<string | null>(null)
+  const [selectedColor, setSelectedColor] = useState<string | null>(null)
   const [selectedPriceRange, setSelectedPriceRange] = useState(priceRanges[0])
   const [showFilters, setShowFilters] = useState(false)
 
@@ -39,30 +46,32 @@ export default function Catalogo() {
         product.marca.toLowerCase().includes(searchQuery.toLowerCase())
       const matchesBrand = !selectedBrand || product.marca === selectedBrand
       const matchesCategory = !selectedCategory || product.categoria === selectedCategory
+      const matchesColor = !selectedColor || product.color === selectedColor
       const matchesSize = !selectedSize || (product.stock_por_talla[selectedSize] && product.stock_por_talla[selectedSize] > 0)
       const matchesPrice = product.precio >= selectedPriceRange.min && product.precio <= selectedPriceRange.max
       
-      return matchesSearch && matchesBrand && matchesCategory && matchesSize && matchesPrice
+      return matchesSearch && matchesBrand && matchesCategory && matchesColor && matchesSize && matchesPrice
     })
-  }, [products, searchQuery, selectedBrand, selectedCategory, selectedSize, selectedPriceRange])
+  }, [products, searchQuery, selectedBrand, selectedCategory, selectedColor, selectedSize, selectedPriceRange])
 
   const clearFilters = () => {
     setSelectedBrand(null)
     setSelectedCategory(null)
+    setSelectedColor(null)
     setSelectedSize(null)
     setSelectedPriceRange(priceRanges[0])
     setSearchQuery('')
     setSearchParams(new URLSearchParams())
   }
 
-  const hasActiveFilters = selectedBrand || selectedCategory || selectedSize || selectedPriceRange.label !== 'Todos' || searchQuery
+  const hasActiveFilters = selectedBrand || selectedCategory || selectedColor || selectedSize || selectedPriceRange.label !== 'Todos' || searchQuery
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight">Catálogo</h1>
-        <p className="mt-2 text-muted-foreground">
+      <div className="mb-12 border-b border-border pb-8">
+        <h1 className="text-6xl font-black uppercase tracking-tighter">Catálogo</h1>
+        <p className="mt-2 text-lg text-muted-foreground uppercase tracking-widest">
           Explora nuestra colección completa de sneakers premium
         </p>
       </div>
@@ -73,19 +82,19 @@ export default function Catalogo() {
           <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
           <input
             type="text"
-            placeholder="Buscar sneakers..."
+            placeholder="BUSCAR SNEAKERS..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full rounded-full border border-border bg-background py-3 pl-12 pr-4 text-sm transition-colors focus:border-primary focus:outline-none"
+            className="w-full rounded-none border-b-2 border-border bg-transparent py-4 pl-12 pr-4 text-sm font-bold tracking-widest uppercase transition-colors focus:border-foreground focus:outline-none placeholder:text-muted-foreground"
           />
         </div>
         <button
           onClick={() => setShowFilters(!showFilters)}
           className={cn(
-            'inline-flex items-center gap-2 rounded-full border px-6 py-3 text-sm font-medium transition-colors',
+            'inline-flex items-center gap-2 rounded-none border-2 px-8 py-4 text-sm font-bold tracking-widest uppercase transition-colors',
             showFilters
-              ? 'border-primary bg-primary text-primary-foreground'
-              : 'border-border bg-background hover:bg-muted'
+              ? 'border-foreground bg-foreground text-background'
+              : 'border-border bg-transparent hover:bg-muted'
           )}
         >
           <SlidersHorizontal className="h-4 w-4" />
@@ -149,6 +158,28 @@ export default function Catalogo() {
                     )}
                   >
                     {category}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <h3 className="mb-3 text-sm font-medium text-muted-foreground">Color</h3>
+              <div className="flex flex-wrap gap-2">
+                {colors.map((color) => (
+                  <button
+                    key={color}
+                    onClick={() =>
+                      setSelectedColor(selectedColor === color ? null : color)
+                    }
+                    className={cn(
+                      'rounded-full px-4 py-2 text-sm transition-colors',
+                      selectedColor === color
+                        ? 'bg-foreground text-background'
+                        : 'bg-muted hover:bg-muted/80'
+                    )}
+                  >
+                    {color}
                   </button>
                 ))}
               </div>

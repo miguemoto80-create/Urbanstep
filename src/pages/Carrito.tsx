@@ -5,65 +5,26 @@ import { formatPrice } from '../lib/utils'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { useProducts } from '../context/ProductContext'
+import { useNavigate } from 'react-router-dom'
 
 export default function Carrito() {
   const { items, updateQuantity, removeFromCart, clearCart, totalPrice } = useCart()
   const { products, fetchProducts } = useProducts()
   const [isProcessing, setIsProcessing] = useState(false)
 
-  const handleCheckout = async () => {
+  const navigate = useNavigate()
+
+  const handleCheckout = () => {
     const token = localStorage.getItem('urban-step-token')
     if (!token) {
-      toast.error('Debes iniciar sesión para finalizar tu compra')
+      toast.error('Debes iniciar sesión para finalizar tu compra', {
+        className: 'bg-[#111] border border-primary text-white',
+      })
+      navigate('/login')
       return
     }
-
-    setIsProcessing(true)
     
-    try {
-      const checkoutItems = items.map(item => ({
-        productId: item.id,
-        size: item.talla,
-        quantity: item.cantidad
-      }))
-
-      const response = await fetch('http://localhost:5000/api/products/checkout', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          items: checkoutItems,
-          total: totalPrice
-        })
-      })
-
-      const result = await response.json()
-
-      if (!response.ok) {
-        throw new Error(result.error || 'Error al procesar el checkout')
-      }
-
-      // Vaciar carrito
-      clearCart()
-      
-      // Actualizar el contexto de productos
-      if (fetchProducts) {
-        await fetchProducts();
-      }
-      
-      toast.success('¡Compra realizada con éxito!', {
-        description: 'Tu pedido está pendiente de envío. Te notificaremos pronto.',
-        duration: 5000,
-        className: 'bg-card border border-primary text-foreground',
-      })
-      
-    } catch (error: any) {
-      toast.error(error.message || 'Ocurrió un error inesperado al procesar tu compra')
-    } finally {
-      setIsProcessing(false)
-    }
+    navigate('/checkout')
   }
 
   if (items.length === 0) {
@@ -200,9 +161,9 @@ export default function Carrito() {
           <button 
             onClick={handleCheckout}
             disabled={isProcessing}
-            className="mt-6 w-full rounded-full bg-primary py-4 font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="mt-6 w-full rounded-full bg-primary py-4 font-bold tracking-wider uppercase text-black transition-all hover:bg-primary/80 hover:shadow-[0_0_20px_var(--primary)] disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isProcessing ? 'Procesando...' : 'Finalizar Compra'}
+            {isProcessing ? 'Procesando...' : 'Proceder al Pago'}
           </button>
 
           <Link

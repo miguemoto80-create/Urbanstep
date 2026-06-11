@@ -5,11 +5,22 @@ import { useCart } from '../context/CartContext'
 import { useAuth } from '../context/AuthContext'
 import { ThemeToggle } from './ThemeToggle'
 import { cn } from '../lib/utils'
+import { useNavigate } from 'react-router-dom'
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
   const { totalItems } = useCart()
   const { user, isAdmin, login, logout } = useAuth()
+  const navigate = useNavigate()
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (searchQuery.trim()) {
+      navigate(`/catalogo?q=${encodeURIComponent(searchQuery.trim())}`)
+      setSearchQuery('')
+    }
+  }
 
   const navLinkClass = ({ isActive }: { isActive: boolean }) =>
     cn(
@@ -42,6 +53,19 @@ export default function Navbar() {
               Admin
             </NavLink>
           )}
+        </div>
+
+        {/* Global Search Bar */}
+        <div className="hidden md:flex flex-1 max-w-md mx-8">
+          <form onSubmit={handleSearch} className="w-full relative">
+            <input
+              type="text"
+              placeholder="Buscar modelos, marcas..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-muted border border-border rounded-full px-4 py-2 text-sm focus:outline-none focus:border-foreground"
+            />
+          </form>
         </div>
 
         <div className="flex items-center gap-4">

@@ -1,5 +1,6 @@
 export interface Product {
   id: string
+  codigo_unico: string
   nombre: string
   precio: number
   marca: string
@@ -7,6 +8,7 @@ export interface Product {
   descripcion: string
   stock_por_talla: Record<string, number>
   categoria?: string
+  color?: string
 }
 
 export interface CartItem extends Product {

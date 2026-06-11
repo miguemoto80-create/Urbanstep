@@ -8,6 +8,11 @@ import Carrito from './pages/Carrito'
 import Admin from './pages/Admin'
 import Login from './pages/Login'
 import Registro from './pages/Registro'
+import Checkout from './pages/Checkout'
+import Invoice from './pages/Invoice'
+import Nosotros from './pages/Nosotros'
+import Contacto from './pages/Contacto'
+import Blog from './pages/Blog'
 import ProtectedRoute from './components/ProtectedRoute'
 
 function App() {
@@ -21,6 +26,11 @@ function App() {
         <Route path="carrito" element={<Carrito />} />
         <Route path="login" element={<Login />} />
         <Route path="registro" element={<Registro />} />
+        <Route path="checkout" element={<Checkout />} />
+        <Route path="invoice/:id" element={<Invoice />} />
+        <Route path="nosotros" element={<Nosotros />} />
+        <Route path="contacto" element={<Contacto />} />
+        <Route path="blog" element={<Blog />} />
         
         {/* Rutas protegidas para Administrador */}
         <Route element={<ProtectedRoute requiredRole="admin" />}>

@@ -20,6 +20,22 @@ const Order = sequelize.define('Order', {
     type: DataTypes.JSON, // Guardar array de productos comprados (id, talla, cantidad, precio)
     allowNull: false,
   },
+  direccion: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  metodo_pago: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  nombre_cliente: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  email_cliente: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  }
 });
 
 User.hasMany(Order);

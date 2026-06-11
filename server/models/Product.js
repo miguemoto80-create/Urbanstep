@@ -11,6 +11,11 @@ const Product = sequelize.define('Product', {
     type: DataTypes.STRING,
     allowNull: false,
   },
+  codigo_unico: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    unique: true,
+  },
   marca: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -26,6 +31,10 @@ const Product = sequelize.define('Product', {
   categoria: {
     type: DataTypes.STRING,
     defaultValue: 'Lifestyle',
+  },
+  color: {
+    type: DataTypes.STRING,
+    allowNull: true,
   },
   descripcion: {
     type: DataTypes.TEXT,
